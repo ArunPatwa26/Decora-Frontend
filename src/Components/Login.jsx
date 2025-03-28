@@ -213,7 +213,7 @@ const Login = () => {
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link to="/privacy" className="text-blue-600 hover:underline">
+          <Link to="/admin-dashboard" className="text-blue-600 hover:underline">
             Privacy Policy
           </Link>
           .

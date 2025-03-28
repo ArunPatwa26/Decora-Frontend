@@ -30,7 +30,7 @@ const Orders = () => {
           response.data.orders.map(async (order) => {
             const updatedProducts = await Promise.all(
               order.products.map(async (product) => {
-                const productResponse = await axios.get(`${BACKEND_URL}}/api/products/${product.cartItem}`);
+                const productResponse = await axios.get(`${BACKEND_URL}/api/products/${product.cartItem}`);
                 return { ...product, productDetails: productResponse.data };
               })
             );
