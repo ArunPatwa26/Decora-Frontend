@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Hide scrollbar in Webkit browsers (Chrome, Safari, etc.) */
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* Hide scrollbar in IE and Edge */
+  }  
