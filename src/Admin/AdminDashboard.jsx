@@ -30,6 +30,16 @@ export default function AdminDashboard() {
   const [timeRange, setTimeRange] = useState('monthly');
   const [error, setError] = useState(null);
   const { BACKEND_URL } = useBackend();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Check screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Check authentication and fetch data
   useEffect(() => {
@@ -74,7 +84,7 @@ export default function AdminDashboard() {
           totalEarnings: earnings,
           pendingApprovals: pendingCount,
           activeProducts: productsData.length,
-          recentOrders: ordersData.slice(0, 5).map(order => ({
+          recentOrders: ordersData.slice(0, isMobile ? 3 : 5).map(order => ({
             ...order,
             shortId: order._id?.slice(-6).toUpperCase() || 'N/A'
           })),
@@ -91,7 +101,7 @@ export default function AdminDashboard() {
     };
 
     fetchDashboardData();
-  }, [navigate, timeRange]);
+  }, [navigate, timeRange, isMobile]);
 
   // Generate fallback data for charts
   const generateFallbackSalesData = () => {
@@ -121,28 +131,28 @@ export default function AdminDashboard() {
     navigate('/admin-login');
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <div className='fixed h-full'>
+  // Colors for charts
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <AdminNavbar />
-      </div>
       
-      <div className="flex-1 p-6 md:p-8 overflow-x-hidden ml-55">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden md:ml-64">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard Overview</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 ml-14">Dashboard Overview</h1>
+            <p className="text-gray-600 mt-1 text-sm md:text-base ml-14">
               Welcome back, <span className="font-semibold text-indigo-600">{adminData.name || 'Admin'}</span>
             </p>
-            {error && <p className="text-red-500 text-sm mt-2">Error: {error}</p>}
+            {error && <p className="text-red-500 text-xs md:text-sm mt-2">Error: {error}</p>}
           </div>
-          <div className="mt-4 md:mt-0 flex items-center space-x-4">
+          <div className="mt-3 md:mt-0 flex items-center space-x-2 md:space-x-4">
             <select 
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-white border border-gray-300 rounded-md px-2 py-1 md:px-3 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
@@ -150,7 +160,7 @@ export default function AdminDashboard() {
             </select>
             <button
               onClick={handleLogout}
-              className="bg-red-100 text-red-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-200 transition-colors"
+              className="bg-red-100 text-red-600 px-2 py-1 md:px-4 md:py-2 rounded-md text-xs md:text-sm font-medium hover:bg-red-200 transition-colors"
             >
               Logout
             </button>
@@ -158,9 +168,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <StatCard 
-            icon={<FiUsers className="text-indigo-500" size={24} />}
+            icon={<FiUsers className="text-indigo-500" size={20} />}
             title="Total Users"
             value={loading ? '...' : dashboardData.totalUsers}
             change={loading ? '...' : "+12%"}
@@ -168,7 +178,7 @@ export default function AdminDashboard() {
             color="indigo"
           />
           <StatCard 
-            icon={<FiDollarSign className="text-green-500" size={24} />}
+            icon={<FiDollarSign className="text-green-500" size={20} />}
             title="Total Revenue"
             value={loading ? '...' : `₹${dashboardData.totalEarnings.toFixed(2)}`}
             change={loading ? '...' : "+24%"}
@@ -176,7 +186,7 @@ export default function AdminDashboard() {
             color="green"
           />
           <StatCard 
-            icon={<FiClock className="text-yellow-500" size={24} />}
+            icon={<FiClock className="text-yellow-500" size={20} />}
             title="Pending Orders"
             value={loading ? '...' : dashboardData.pendingApprovals}
             change={loading ? '...' : "-5%"}
@@ -184,7 +194,7 @@ export default function AdminDashboard() {
             color="yellow"
           />
           <StatCard 
-            icon={<FiBox className="text-blue-500" size={24} />}
+            icon={<FiBox className="text-blue-500" size={20} />}
             title="Active Products"
             value={loading ? '...' : dashboardData.activeProducts}
             change={loading ? '...' : "+8%"}
@@ -194,17 +204,17 @@ export default function AdminDashboard() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-8">
           {/* Sales Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Sales Overview ({timeRange})</h3>
-              <div className="flex space-x-2">
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-0">Sales Overview ({timeRange})</h3>
+              <div className="flex space-x-1 md:space-x-2">
                 {['weekly', 'monthly', 'yearly'].map(range => (
                   <button
                     key={range}
                     onClick={() => setTimeRange(range)}
-                    className={`px-3 py-1 text-xs rounded-md capitalize ${
+                    className={`px-2 py-1 md:px-3 md:py-1 text-xs rounded-md capitalize ${
                       timeRange === range 
                         ? 'bg-indigo-100 text-indigo-700' 
                         : 'bg-gray-100 text-gray-700'
@@ -215,10 +225,10 @@ export default function AdminDashboard() {
                 ))}
               </div>
             </div>
-            <div className="h-80">
+            <div className="h-60 md:h-80">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                  <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -236,12 +246,12 @@ export default function AdminDashboard() {
           </div>
 
           {/* Product Categories */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Product Categories</h3>
-            <div className="h-80">
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Product Categories</h3>
+            <div className="h-60 md:h-80">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                  <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -250,8 +260,8 @@ export default function AdminDashboard() {
                       data={productCategoryData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
+                      innerRadius={isMobile ? 40 : 60}
+                      outerRadius={isMobile ? 60 : 80}
                       fill="#8884d8"
                       paddingAngle={5}
                       dataKey="value"
@@ -270,14 +280,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Orders and Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {/* Recent Orders */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Recent Orders</h3>
+          <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-0">Recent Orders</h3>
               <button 
                 onClick={() => navigate('/manage-orders')}
-                className="text-indigo-600 text-sm font-medium hover:text-indigo-800"
+                className="text-indigo-600 text-xs md:text-sm font-medium hover:text-indigo-800"
               >
                 View All
               </button>
@@ -286,10 +296,10 @@ export default function AdminDashboard() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                    <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                    <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-3 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -302,16 +312,16 @@ export default function AdminDashboard() {
                   ) : dashboardData.recentOrders.length > 0 ? (
                     dashboardData.recentOrders.map((order) => (
                       <tr key={order._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium text-gray-900">
                           #{order.shortId}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
                           {order.user?.name || 'Guest'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
                           ₹{(order.total_price || 0).toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-2 md:px-6 md:py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                             ${order.status?.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800' :
                               order.status?.toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -334,29 +344,29 @@ export default function AdminDashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-            <div className="space-y-4">
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Quick Actions</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
               <QuickActionCard 
-                icon={<FiTrendingUp className="text-green-500" size={20} />}
+                icon={<FiTrendingUp className="text-green-500" size={18} />}
                 title="Add New Product"
                 description="Create a new product listing"
                 onClick={() => navigate('/add-product')}
               />
               <QuickActionCard 
-                icon={<FiUsers className="text-blue-500" size={20} />}
+                icon={<FiUsers className="text-blue-500" size={18} />}
                 title="Manage Users"
                 description="View and manage all users"
                 onClick={() => navigate('/manage-users')}
               />
               <QuickActionCard 
-                icon={<FiShoppingCart className="text-purple-500" size={20} />}
+                icon={<FiShoppingCart className="text-purple-500" size={18} />}
                 title="Process Orders"
                 description="Update order statuses"
                 onClick={() => navigate('/manage-orders')}
               />
               <QuickActionCard 
-                icon={<FiBox className="text-orange-500" size={20} />}
+                icon={<FiBox className="text-orange-500" size={18} />}
                 title="Inventory"
                 description="Check product stock levels"
                 onClick={() => navigate('/inventory')}
@@ -366,7 +376,7 @@ export default function AdminDashboard() {
         </div>
 
         <ToastContainer position="top-right" autoClose={3000} />
-      </div>
+      </main>
     </div>
   );
 }
@@ -381,15 +391,15 @@ function StatCard({ icon, title, value, change, loading, color }) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className="flex items-center space-x-2 md:space-x-4">
+          <div className={`p-2 md:p-3 rounded-lg ${colorClasses[color]}`}>
             {icon}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
-            <h3 className="text-2xl font-bold mt-1">
+            <p className="text-xs md:text-sm font-medium text-gray-500">{title}</p>
+            <h3 className="text-lg md:text-2xl font-bold mt-1">
               {value}
             </h3>
           </div>
@@ -409,20 +419,17 @@ function QuickActionCard({ icon, title, description, onClick }) {
   return (
     <div 
       onClick={onClick}
-      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+      className="p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
     >
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-gray-100 rounded-lg">
+      <div className="flex items-center space-x-2 md:space-x-3">
+        <div className="p-1 md:p-2 bg-gray-100 rounded-lg">
           {icon}
         </div>
         <div>
-          <h4 className="font-medium text-gray-800">{title}</h4>
-          <p className="text-sm text-gray-500">{description}</p>
+          <h4 className="text-sm md:text-base font-medium text-gray-800">{title}</h4>
+          <p className="text-xs md:text-sm text-gray-500">{description}</p>
         </div>
       </div>
     </div>
   );
 }
-
-// Chart colors
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];

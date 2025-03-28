@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import { FaLock, FaEnvelope, FaSignInAlt } from 'react-icons/fa';
 import { useBackend } from '../context';
 
@@ -142,9 +142,12 @@ export default function AdminLogin() {
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+                   <Link
+                                  to="/login"
+                                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -165,6 +168,7 @@ export default function AdminLogin() {
                   ) : (
                     <>
                       <FaSignInAlt className="mr-2" />
+                      
                       Sign In
                     </>
                   )}
