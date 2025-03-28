@@ -28,7 +28,7 @@ import AdminProfile from './Admin/AdminProfile';
 
 function App() {
   return (
-    <div className="mx-10">
+    <div >
       <Routes>
         {/* User Routes with Navbar and Footer */}
         <Route path="/" element={
