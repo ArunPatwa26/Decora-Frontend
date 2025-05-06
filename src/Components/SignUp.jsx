@@ -39,43 +39,67 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     const { name, email, password, address, image } = formData;
-
+  
     if (!name || !email || !password || !address || !image) {
       toast.error("All fields are required!", { position: "top-center" });
       setIsLoading(false);
       return;
     }
-
+  
     const data = new FormData();
     data.append("name", name);
     data.append("email", email);
     data.append("password", password);
     data.append("address", address);
     data.append("profilePicture", image);
-
+  
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/user/register`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
+  
       if (response.data.success) {
         toast.success("Account created successfully!", { position: "top-center" });
-        setTimeout(() => navigate("/login"), 1500);
+  
+        const userEmail = formData.email;
+  
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          address: "",
+          image: null,
+        });
+  
+        setPreviewImage("");
+  
+        // Redirect after 1.5 seconds
+        setTimeout(() => {
+          navigate("/login", {
+            state: { fromSignUp: true, email: userEmail },
+            replace: true,
+          });
+        }, 1500);
       } else {
         toast.error(response.data.message || "Registration failed", { position: "top-center" });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Signup failed", { position: "top-center" });
+      const errorMessage = error.response?.data?.message || "Signup failed";
+      toast.error(errorMessage, { position: "top-center" });
       console.error("Signup Error:", error);
+  
+      if (errorMessage.toLowerCase().includes("email")) {
+        document.querySelector('input[name="email"]')?.focus();
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <motion.div

@@ -168,7 +168,7 @@ const Cart = () => {
 
                   {/* Price */}
                   <div className="col-span-4 md:col-span-2 flex items-center justify-start md:justify-center mt-4 md:mt-0">
-                    <span className="font-medium">${item.cartItem?.price?.toFixed(2)}</span>
+                    <span className="font-medium">₹{item.cartItem?.price?.toFixed(2)}</span>
                   </div>
 
                   {/* Quantity */}
@@ -193,7 +193,7 @@ const Cart = () => {
                   {/* Total & Remove */}
                   <div className="col-span-4 md:col-span-2 flex items-center justify-end mt-4 md:mt-0">
                     <span className="font-medium mr-4">
-                      ${(item.cartItem?.price * item.quantity).toFixed(2)}
+                    ₹{(item.cartItem?.price * item.quantity).toFixed(2)}
                     </span>
                     <button
                       onClick={() => removeFromCart(item._id)}
@@ -215,19 +215,19 @@ const Cart = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">${shipping.toFixed(2)}</span>
+                  <span className="font-medium">₹{shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax (10%)</span>
-                  <span className="font-medium">${tax.toFixed(2)}</span>
+                  <span className="font-medium">₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-4 flex justify-between">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-blue-600">${totalPrice.toFixed(2)}</span>
+                  <span className="font-bold text-blue-600">₹{totalPrice.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -242,7 +242,7 @@ const Cart = () => {
                 <p className="text-sm text-gray-500">
                   or{' '}
                   <button 
-                    onClick={() => navigate("/products")}
+                    onClick={() => navigate("/all-products")}
                     className="text-blue-600 hover:underline"
                   >
                     Continue Shopping

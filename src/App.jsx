@@ -25,10 +25,12 @@ import EditProduct from './Admin/EditProduct';
 import AddProducts from './Admin/AddProducts';
 import ManageOrders from './Admin/ManageOrders';
 import AdminProfile from './Admin/AdminProfile';
+import ScrollToTop from "./Pages/ScrollToTop";
 
 function App() {
   return (
     <div >
+      <ScrollToTop />
       <Routes>
         {/* User Routes with Navbar and Footer */}
         <Route path="/" element={

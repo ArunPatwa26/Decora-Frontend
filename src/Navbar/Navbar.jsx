@@ -1,39 +1,59 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, ChevronDown, Search, Menu, X } from "lucide-react";
 import { useBackend } from "../context";
 import axios from "axios";
 
 const Navbar = () => {
   const { BACKEND_URL } = useBackend();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("e-user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Detects route change
 
+  // Watch localStorage changes across tabs
   useEffect(() => {
-    const storedUser = localStorage.getItem("e-user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    }
+    const handleStorageChange = () => {
+      const storedUser = localStorage.getItem("e-user");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Re-read user on route changes (covers in-app navigation)
   useEffect(() => {
-    if (user?._id) {
-      fetchCartCount(user._id);
-      const interval = setInterval(() => fetchCartCount(user._id), 5000);
-      return () => clearInterval(interval);
-    }
+    const storedUser = localStorage.getItem("e-user");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+  }, [location]);
+
+  // Fetch cart count on user change and poll every 5s
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const fetchAndSetCount = () => fetchCartCount(user._id);
+    fetchAndSetCount(); // Initial
+
+    const interval = setInterval(fetchAndSetCount, 5000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const fetchCartCount = async (userId) => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/cart/${userId}`);
-      if (response.data?.cartCount !== undefined) {
-        setCartCount(response.data.cartCount);
+      if (typeof response.data?.cartCount === "number") {
+        setCartCount((prevCount) =>
+          prevCount !== response.data.cartCount ? response.data.cartCount : prevCount
+        );
+      } else {
+        setCartCount(0); // fallback
       }
     } catch (error) {
       console.error("Error fetching cart count:", error);
@@ -47,7 +67,6 @@ const Navbar = () => {
     setCartCount(0);
     navigate("/login");
   };
-
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       {/* Desktop Navbar */}
