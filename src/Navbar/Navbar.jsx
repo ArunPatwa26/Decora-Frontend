@@ -259,18 +259,18 @@ const Navbar = () => {
                   Home
                 </Link>
                 <Link
-                  to="/products"
+                  to="/all-products"
                   className="px-3 py-2 text-gray-700 rounded-md hover:bg-gray-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Shop
                 </Link>
                 <Link
-                  to="/categories"
+                  to="/contact"
                   className="px-3 py-2 text-gray-700 rounded-md hover:bg-gray-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Categories
+                  Contact
                 </Link>
                 <Link
                   to="/about"
@@ -298,6 +298,13 @@ const Navbar = () => {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       My Orders
+                    </Link>
+                    <Link
+                      to="/wishlist"
+                      className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      My Wishlist
                     </Link>
                     <button
                       onClick={() => {
