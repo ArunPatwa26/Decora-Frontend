@@ -15,7 +15,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Detects route change
+  const location = useLocation();
 
   // Watch localStorage changes across tabs
   useEffect(() => {
@@ -28,7 +28,7 @@ const Navbar = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Re-read user on route changes (covers in-app navigation)
+  // Re-read user on route changes
   useEffect(() => {
     const storedUser = localStorage.getItem("e-user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
@@ -36,10 +36,13 @@ const Navbar = () => {
 
   // Fetch cart count on user change and poll every 5s
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?._id) {
+      setCartCount(0);
+      return;
+    }
 
     const fetchAndSetCount = () => fetchCartCount(user._id);
-    fetchAndSetCount(); // Initial
+    fetchAndSetCount();
 
     const interval = setInterval(fetchAndSetCount, 5000);
     return () => clearInterval(interval);
@@ -53,7 +56,7 @@ const Navbar = () => {
           prevCount !== response.data.cartCount ? response.data.cartCount : prevCount
         );
       } else {
-        setCartCount(0); // fallback
+        setCartCount(0);
       }
     } catch (error) {
       console.error("Error fetching cart count:", error);
@@ -67,6 +70,7 @@ const Navbar = () => {
     setCartCount(0);
     navigate("/login");
   };
+
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       {/* Desktop Navbar */}
@@ -98,7 +102,7 @@ const Navbar = () => {
 
             {/* Right Side */}
             <div className="flex items-center space-x-6">
-              {/* Search Button (Desktop) */}
+              {/* Search Button */}
               <button 
                 onClick={() => navigate('/search')}
                 className="text-gray-600 hover:text-blue-600 transition"
@@ -180,22 +184,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
-        {/* Search Bar (Desktop) */}
-        {searchOpen && (
-          <div className="bg-gray-50 py-3 border-t">
-            <div className="container mx-auto px-4">
-              <div className="relative max-w-xl mx-auto" >
-                <input
-                  type="text"
-                  placeholder="Search for products, brands, and more..."
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Mobile Navbar */}
@@ -221,25 +209,28 @@ const Navbar = () => {
               </span>
             </Link>
 
-            {/* Cart Icon */}
+            {/* Right Icons */}
             <div className="flex items-center space-x-4">
-            <button
-                   
-                    className="flex items-center space-x-1 focus:outline-none gap-2"
-                  >
-                     <Link
-                        to="/profile">
+              {/* Search Button (Mobile) */}
+              <button 
+                onClick={() => navigate('/search')}
+                className="text-gray-600 hover:text-blue-600 transition"
+              >
+                <Search className="w-5 h-5" />
+              </button>
 
-                    <img
-                      src={user.profilePicture || "https://via.placeholder.com/40"}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      />
-                      </Link>
+              {/* User Profile (Mobile) - Only show if logged in */}
+              {user && (
+                <Link to="/profile" className="flex items-center">
+                  <img
+                    src={user.profilePicture || "https://via.placeholder.com/40"}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  />
+                </Link>
+              )}
 
-          
-                  </button>
-
+              {/* Cart */}
               <Link to="/cart" className="relative">
                 <ShoppingCart className="w-5 h-5 text-gray-600" />
                 {cartCount > 0 && (
