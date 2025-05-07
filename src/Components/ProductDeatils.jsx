@@ -190,7 +190,7 @@ const ProductDetails = () => {
 
     if (userWishlistIndex !== -1) {
       const isProductInWishlist = wishlist[userWishlistIndex].products.some(
-        (item) => item.id === product.id
+        (item) => item._id === product._id
       );
       if (isProductInWishlist) {
         toast.info(`${product.name} is already in your wishlist!`);
@@ -572,66 +572,117 @@ const ProductDetails = () => {
         
   
         {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                You May Also Like
-              </h2>
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                View all <FiChevronRight className="ml-1" />
+  <div className="mt-16">
+    <div className="flex items-center justify-between mb-6 px-2 sm:px-0">
+      <h2 className="text-2xl font-bold text-gray-900">
+        You May Also Like
+      </h2>
+      <button  onClick={() => navigate(`/all-products`)} className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+        View all <FiChevronRight className="ml-1" />
+      </button>
+    </div>
+
+    <div className="lg:grid lg:grid-cols-4 gap-6 hidden sm:grid">
+      {relatedProducts.map((relatedProduct) => (
+        <div
+          key={relatedProduct._id}
+          className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer group border border-gray-100"
+          onClick={() => navigate(`/product/${relatedProduct._id}`)}
+        >
+          <div className="relative">
+            <img
+              src={relatedProduct.imageUrl}
+              alt={relatedProduct.name}
+              className="w-full h-48 object-contain p-4"
+            />
+            <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+              <FiHeart className="text-gray-400 hover:text-red-500" />
+            </button>
+            {relatedProduct.originalPrice && (
+              <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                SALE
+              </div>
+            )}
+          </div>
+          <div className="p-4 border-t">
+            <h3 className="font-medium text-gray-900 line-clamp-1">
+              {relatedProduct.name}
+            </h3>
+            <div className="mt-2 flex items-center">
+              <div className="flex mr-2">
+                {renderRatingStars(relatedProduct.rating || 0)}
+              </div>
+              <span className="text-xs text-gray-500">(24)</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-lg font-bold text-blue-600">₹{relatedProduct.price}</p>
+              {relatedProduct.originalPrice && (
+                <p className="text-sm text-gray-500 line-through">
+                  ₹{relatedProduct.originalPrice}
+                </p>
+              )}
+            </div>
+            <button className="mt-3 w-full py-2 bg-gray-100 text-gray-800 rounded-md text-sm font-medium hover:bg-gray-200 transition-all">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Mobile horizontal scroll */}
+    <div className="sm:hidden overflow-x-auto mx-2 px-4 pb-4 no-scrollbar ">
+      <div className="flex space-x-4">
+        {relatedProducts.map((relatedProduct) => (
+          <div
+            key={relatedProduct._id}
+            className="min-w-[250px] bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer group border border-gray-100 gap-4 mx-3 "
+            onClick={() => navigate(`/product/${relatedProduct._id}`)}
+          >
+            <div className="relative">
+              <img
+                src={relatedProduct.imageUrl}
+                alt={relatedProduct.name}
+                className="w-full h-40 object-contain p-4"
+              />
+              <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                <FiHeart className="text-gray-400 hover:text-red-500" />
+              </button>
+              {relatedProduct.originalPrice && (
+                <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  SALE
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t">
+              <h3 className="font-medium text-gray-900 line-clamp-1">
+                {relatedProduct.name}
+              </h3>
+              <div className="mt-2 flex items-center">
+                <div className="flex mr-2">
+                  {renderRatingStars(relatedProduct.rating || 0)}
+                </div>
+                <span className="text-xs text-gray-500">(24)</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-lg font-bold text-blue-600">₹{relatedProduct.price}</p>
+                {relatedProduct.originalPrice && (
+                  <p className="text-sm text-gray-500 line-through">
+                    ₹{relatedProduct.originalPrice}
+                  </p>
+                )}
+              </div>
+              <button className="mt-3 w-full py-2 bg-gray-100 text-gray-800 rounded-md text-sm font-medium hover:bg-gray-200 transition-all">
+                Add to Cart
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((relatedProduct) => (
-                <div
-                  key={relatedProduct._id}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer group border border-gray-100"
-                  onClick={() => navigate(`/product/${relatedProduct._id}`)}
-                >
-                  <div className="relative">
-                    <img
-                      src={relatedProduct.imageUrl}
-                      alt={relatedProduct.name}
-                      className="w-full h-48 object-contain p-4"
-                    />
-                    <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FiHeart className="text-gray-400 hover:text-red-500" />
-                    </button>
-                    {relatedProduct.originalPrice && (
-                      <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                        SALE
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4 border-t">
-                    <h3 className="font-medium text-gray-900 line-clamp-1">
-                      {relatedProduct.name}
-                    </h3>
-                    <div className="mt-2 flex items-center">
-                      <div className="flex mr-2">
-                        {renderRatingStars(relatedProduct.rating || 0)}
-                      </div>
-                      <span className="text-xs text-gray-500">(24)</span>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between">
-                      <p className="text-lg font-bold text-blue-600">
-                      ₹{relatedProduct.price}
-                      </p>
-                      {relatedProduct.originalPrice && (
-                        <p className="text-sm text-gray-500 line-through">
-                          ₹{relatedProduct.originalPrice}
-                        </p>
-                      )}
-                    </div>
-                    <button className="mt-3 w-full py-2 bg-gray-100 text-gray-800 rounded-md text-sm font-medium hover:bg-gray-200 transition-all">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        )}
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
   
         {/* Reviews Section */}
         <div className="mt-16">

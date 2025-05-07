@@ -4,17 +4,16 @@ import { ArrowLeft, Heart, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default class WishlistProducts extends Component {
+export default class Wishlist extends Component {
   state = {
     wishlist: [],
-    isLoading: true
+    isLoading: true,
   };
 
   componentDidMount() {
     this.loadWishlist();
   }
 
-  // Load the wishlist for the logged-in user
   loadWishlist = () => {
     const user = JSON.parse(localStorage.getItem("e-user"));
     if (!user) {
@@ -25,27 +24,28 @@ export default class WishlistProducts extends Component {
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     const userWishlist = wishlist.find((entry) => entry.userId === user._id);
 
-    // Simulate loading for better UX
     setTimeout(() => {
-      this.setState({ 
+      this.setState({
         wishlist: userWishlist ? userWishlist.products : [],
-        isLoading: false
+        isLoading: false,
       });
     }, 500);
   };
 
-  // Remove a product from the wishlist
   removeFromWishlist = (productId) => {
     const user = JSON.parse(localStorage.getItem("e-user"));
     if (!user) return;
 
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    const userWishlistIndex = wishlist.findIndex((entry) => entry.userId === user._id);
+    const userWishlistIndex = wishlist.findIndex(
+      (entry) => entry.userId === user._id
+    );
 
     if (userWishlistIndex !== -1) {
-      wishlist[userWishlistIndex].products = wishlist[userWishlistIndex].products.filter(
-        (product) => product._id !== productId
-      );
+      wishlist[userWishlistIndex].products =
+        wishlist[userWishlistIndex].products.filter(
+          (product) => product._id !== productId
+        );
 
       if (wishlist[userWishlistIndex].products.length === 0) {
         wishlist.splice(userWishlistIndex, 1);
@@ -53,9 +53,9 @@ export default class WishlistProducts extends Component {
 
       localStorage.setItem("wishlist", JSON.stringify(wishlist));
       this.loadWishlist();
-      toast.success("Removed from wishlist", { 
+      toast.success("Removed from wishlist", {
         position: "top-center",
-        icon: <Heart className="text-red-500" />
+        icon: <Heart className="text-red-500" />,
       });
     }
   };
@@ -64,47 +64,50 @@ export default class WishlistProducts extends Component {
     const { wishlist, isLoading } = this.state;
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header with back button */}
-          <div className="flex items-center justify-between mb-8">
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors"
+      <div className="min-h-screen bg-white py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <Link
+              to="/"
+              className="mb-4 sm:mb-0 flex items-center text-indigo-600 hover:text-indigo-800 text-base font-medium"
             >
-              <ArrowLeft className="h-5 w-5" />
-              <span className="text-lg font-medium">Back to Shopping</span>
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Shopping
             </Link>
-            
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <Heart className="h-8 w-8 text-red-500 mr-2" />
+
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+              <Heart className="w-7 h-7 text-red-500 mr-2" />
               My Wishlist
             </h1>
           </div>
 
-          {/* Content */}
+          {/* Loader or Error or Content */}
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500" />
             </div>
           ) : wishlist.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="group relative bg-white rounded-lg overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300">
               {wishlist.map((product) => (
                 <div
                   key={product._id}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 group relative"
+                  className="relative bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
                 >
-                  {/* Remove button */}
+                  {/* Remove Button */}
                   <button
                     onClick={() => this.removeFromWishlist(product._id)}
-                    className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow-md hover:bg-red-50 text-gray-500 hover:text-red-500 transition-colors"
+                    className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow hover:bg-red-50 text-gray-500 hover:text-red-500 transition"
                     aria-label="Remove from wishlist"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
 
-                  {/* Product image */}
-                  <Link to={`/product/${product._id}`} className="block relative pt-[100%] overflow-hidden">
+                  {/* Product Image */}
+                  <Link
+                    to={`/product/${product._id}`}
+                    className="block relative pt-[100%] overflow-hidden rounded-t-xl"
+                  >
                     <img
                       src={product.images[0] || "https://via.placeholder.com/300"}
                       alt={product.name}
@@ -112,16 +115,18 @@ export default class WishlistProducts extends Component {
                     />
                   </Link>
 
-                  {/* Product info */}
-                  <div className="p-4">
-                    <Link to={`/product/${product._id}`} className="block">
-                      <h3 className="font-medium text-gray-900 line-clamp-1 hover:text-indigo-600 transition-colors">
+                  {/* Product Info */}
+                  <div className="p-4 flex flex-col justify-between h-[140px]">
+                    <Link to={`/product/${product._id}`}>
+                      <h3 className="text-sm font-medium text-gray-900 line-clamp-2 hover:text-indigo-600">
                         {product.name}
                       </h3>
                     </Link>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-lg font-bold text-indigo-600">${product.price}</span>
-                      <button className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">
+                    <div className="mt-2 flex justify-between items-center">
+                      <span className="text-lg font-semibold text-indigo-600">
+                      ₹{product.price}
+                      </span>
+                      <button className="text-sm px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
                         Add to Cart
                       </button>
                     </div>
@@ -131,16 +136,16 @@ export default class WishlistProducts extends Component {
             </div>
           ) : (
             <div className="text-center py-16">
-              <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
-                <Heart className="h-full w-full" strokeWidth={1} />
-              </div>
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Your wishlist is empty</h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                You haven't added any items to your wishlist yet. Start shopping to add your favorite products!
+              <Heart className="w-16 h-16 mx-auto text-gray-300 mb-4" strokeWidth={1} />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                Your wishlist is empty
+              </h3>
+              <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+                You haven’t added anything yet. Start shopping to add products you love.
               </p>
               <Link
                 to="/"
-                className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-block px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700 transition"
               >
                 Browse Products
               </Link>

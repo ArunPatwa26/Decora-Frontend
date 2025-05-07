@@ -223,6 +223,23 @@ const Navbar = () => {
 
             {/* Cart Icon */}
             <div className="flex items-center space-x-4">
+            <button
+                   
+                    className="flex items-center space-x-1 focus:outline-none gap-2"
+                  >
+                     <Link
+                        to="/profile">
+
+                    <img
+                      src={user.profilePicture || "https://via.placeholder.com/40"}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
+                      </Link>
+
+          
+                  </button>
+
               <Link to="/cart" className="relative">
                 <ShoppingCart className="w-5 h-5 text-gray-600" />
                 {cartCount > 0 && (
@@ -240,7 +257,7 @@ const Navbar = () => {
           <div className="bg-white border-t">
             <div className="container mx-auto px-4 py-2">
               {/* Search Bar */}
-              <div className="relative mb-4">
+              <div className="relative mb-4" onClick={() => navigate('/search')}>
                 <input
                   type="text"
                   placeholder="Search..."
