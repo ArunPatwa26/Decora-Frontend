@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route ,Navigate} from 'react-router-dom';
 import Navbar from './Navbar/Navbar';
 import Footer from './Navbar/Footer';
 import GetProductsByID from './Components/GetProductsByID';
@@ -196,6 +196,7 @@ function App() {
           </>
           
           } />
+          <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
   );
